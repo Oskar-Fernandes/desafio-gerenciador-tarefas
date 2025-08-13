@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"> <h:head>
+    <title>Gerenciador de Tarefas</title>
+    <style>
+
+        body.ui-body {
+            font-size: 14px;
+            margin: 20px;
+        }
+    </style>
+</h:head>
+<h:body>
+    <h:form id="formPrincipal">
+        <p:panel header="Cadastrar Tarefa">
+            <p:panelGrid columns="4" styleClass="ui-noborder" style="width:100%;">
+                <p:outputLabel for="titulo" value="Título:"/>
+                <p:inputText id="titulo" value="#{tarefaBean.tarefa.titulo}" required="true" style="width: 100%;"/>
+
+                <p:outputLabel for="responsavel" value="Responsável:"/>
+                <p:inputText id="responsavel" value="#{tarefaBean.tarefa.responsavel}" required="true" style="width: 100%;"/>
+
+                <p:outputLabel for="descricao" value="Descrição:"/>
+                <p:inputTextarea id="descricao" value="#{tarefaBean.tarefa.descricao}" rows="5" style="width: 100%;" colspan="3"/>
+
+                <p:outputLabel for="prioridade" value="Prioridade:"/>
+                <p:selectOneMenu id="prioridade" value="#{tarefaBean.tarefa.prioridade}" required="true">
+                    <f:selectItems value="#{tarefaBean.prioridades}" var="p" itemLabel="#{p}" itemValue="#{p}"/>
+                </p:selectOneMenu>
+
+                <p:outputLabel for="deadline" value="Deadline:"/>
+                <p:calendar id="deadline" value="#{tarefaBean.tarefa.deadline}" required="true" pattern="yyyy-MM-dd" mask="true"/>
+            </p:panelGrid>
+
+            <p:commandButton value="Cadastrar" action="#{tarefaBean.salvar}" update="@form :formTabela" style="margin-top:10px;"/>
+            <p:messages id="messages" showDetail="true" closable="true">
+                <p:autoUpdate/>
+            </p:messages>
+        </p:panel>
+    </h:form>
+
+    <h:form id="formTabela" style="margin-top:20px;">
+        <p:panel header="Listagem de Tarefas">
+            <p:panelGrid columns="4" styleClass="ui-noborder" style="padding-left: 0;">
+                <p:outputLabel for="filtroTitulo" value="Título:"/>
+                <p:inputText id="filtroTitulo" value="#{tarefaBean.filtroTitulo}"/>
+
+                <p:outputLabel for="filtroResponsavel" value="Responsável:"/>
+                <p:inputText id="filtroResponsavel" value="#{tarefaBean.filtroResponsavel}"/>
+
+                <p:commandButton value="Buscar Tarefas" icon="pi pi-search"
+                                 action="#{tarefaBean.buscar}"
+                                 update=":formTabela:tabelaTarefas"/>
+            </p:panelGrid>
+
+            <p:separator style="margin-top: 10px; margin-bottom: 10px;"/>
+            <p:dataTable id="tabelaTarefas" value="#{tarefaBean.tarefasEmAndamento}" var="t"
+                         paginator="true" rows="10" emptyMessage="Nenhuma tarefa em andamento encontrada.">
+
+                <p:column headerText="Número" sortBy="#{t.id}" style="width:80px; text-align:center;">
+                    <h:outputText value="#{t.id}" />
+                </p:column>
+
+                <p:column headerText="Título" sortBy="#{t.titulo}">
+                    <h:outputText value="#{t.titulo}" />
+                </p:column>
+
+                <p:column headerText="Responsável" sortBy="#{t.responsavel}" style="width:200px;">
+                    <h:outputText value="#{t.responsavel}" />
+                </p:column>
+
+                <p:column headerText="Ações" style="width:180px; text-align:center;">
+                    <p:commandButton icon="pi pi-pencil" title="Editar" action="#{tarefaBean.editar(t)}" update=":formPrincipal" styleClass="rounded-button ui-button-info" style="margin-right: 5px;"/>
+                    <p:commandButton icon="pi pi-trash" title="Excluir" action="#{tarefaBean.remover(t)}" update="tabelaTarefas" styleClass="rounded-button ui-button-danger" style="margin-right: 5px;">
+                        <p:confirm header="Confirmação" message="Tem certeza que deseja excluir esta tarefa?" icon="pi pi-exclamation-triangle"/>
+                    </p:commandButton>
+                    <p:commandButton icon="pi pi-check" title="Concluir" action="#{tarefaBean.concluir(t)}" update="tabelaTarefas" styleClass="rounded-button ui-button-success"/>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
+    </h:form>
+
+    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+        <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"/>
+        <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" />
+    </p:confirmDialog>
+
+</h:body>
+</html>
+
+
+
+
